@@ -1,29 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Chart from 'chart.js/auto';
+import axios from 'axios';
 
 export default function Calculator() {
   const [chart, setChart] = useState(null);
-  const [startYear, setStartYear] = useState(2012);
+  const [startYear, setStartYear] = useState(2021);
   const [endYear, setEndYear] = useState(new Date().getFullYear());
   const [yearsArray, setYearsArray] = useState([]);
   const [rangeArray, setRangeArray] = useState([]);
+  const [revenue, setRevenue] = useState({});
 
   const generateChart = () => {
     if (chart) chart.destroy();
 
-    const revenue = {
-      2012: 1000,
-      2013: 1500,
-      2014: 2000,
-      2015: 2500,
-      2016: 3000,
-      2017: 4000,
-      2018: 5000,
-      2019: 7000,
-      2020: 9000,
-      2021: 5000,
-      2022: 11000,
-    };
+    console.log(revenue);
 
     const graph = new Chart(document.getElementById('chart-container'), {
       type: 'line',
@@ -39,6 +29,36 @@ export default function Calculator() {
     });
 
     setChart(graph);
+  };
+
+  const fetchData = async () => {
+    yearsArray.forEach((year) => {
+      axios
+        .get(
+          `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${formatDate(
+            year
+          )}&localization=false`,
+          { headers: { 'Access-Control-Allow-Origin': '*' } }
+        )
+        .then(function (response) {
+          // handle success
+          revenue[year] = response.data.market_data.current_price.eur;
+        })
+        .catch(function (error) {
+          // handle error
+          console.log('error', error);
+        });
+    });
+  };
+
+  const formatDate = (year) => {
+    if (year === new Date().getFullYear()) {
+      return new Date().toLocaleDateString().replaceAll('/', '-');
+    } else {
+      return new Date(`${year}-12-31`)
+        .toLocaleDateString()
+        .replaceAll('/', '-');
+    }
   };
 
   const populateYearsArray = () => {
@@ -64,6 +84,7 @@ export default function Calculator() {
 
   useEffect(() => {
     if (rangeArray.length > 0) {
+      fetchData();
       generateChart();
     }
   }, [rangeArray]);
