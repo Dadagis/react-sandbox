@@ -3,7 +3,6 @@ import Chart from 'chart.js/auto';
 
 export default function Calculator() {
   const [chart, setChart] = useState(null);
-  const [chartLoaded, setChartLoaded] = useState(null);
   const [startYear, setStartYear] = useState(2012);
   const [endYear, setEndYear] = useState(new Date().getFullYear());
   const [yearsArray, setYearsArray] = useState([]);
@@ -12,11 +11,19 @@ export default function Calculator() {
   const generateChart = () => {
     if (chart) chart.destroy();
 
-    console.log(yearsArray);
-
-    const revenue = [
-      1000, 1500, 2000, 2500, 3000, 4000, 5000, 7000, 9000, 5000, 11000,
-    ];
+    const revenue = {
+      2012: 1000,
+      2013: 1500,
+      2014: 2000,
+      2015: 2500,
+      2016: 3000,
+      2017: 4000,
+      2018: 5000,
+      2019: 7000,
+      2020: 9000,
+      2021: 5000,
+      2022: 11000,
+    };
 
     const graph = new Chart(document.getElementById('chart-container'), {
       type: 'line',
@@ -25,50 +32,45 @@ export default function Calculator() {
         datasets: [
           {
             label: 'Revenue',
-            data: revenue.map((data) => data),
+            data: rangeArray.map((year) => revenue[year]),
           },
         ],
       },
     });
 
     setChart(graph);
-    setChartLoaded(true);
   };
 
   const populateYearsArray = () => {
     const currentYear = new Date().getFullYear();
     const yearsArray = [];
-    for (let year = startYear; year < currentYear; year++) {
+    for (let year = startYear; year <= currentYear; year++) {
       yearsArray.push(year);
     }
     setYearsArray(yearsArray);
   };
 
   const populateRangeArray = () => {
-    console.log('coucou', startYear);
-    console.log('coucou', endYear);
     const rangeArray = [];
-    for (let year = startYear; year < endYear; year++) {
+    for (let year = startYear; year <= endYear; year++) {
       rangeArray.push(year);
     }
-  };
-
-  const updateChartStartDate = ({ target }) => {
-    setStartYear(target.value);
-    populateRangeArray();
-    generateChart();
-  };
-
-  const updateChartEndDate = ({ target }) => {
-    setEndYear(target.value);
-    populateRangeArray();
-    generateChart();
+    setRangeArray(rangeArray);
   };
 
   useEffect(() => {
     populateYearsArray();
-    populateRangeArray();
   }, []);
+
+  useEffect(() => {
+    if (rangeArray.length > 0) {
+      generateChart();
+    }
+  }, [rangeArray]);
+
+  useEffect(() => {
+    populateRangeArray();
+  }, [startYear, endYear]);
 
   return (
     <div>
@@ -79,7 +81,9 @@ export default function Calculator() {
       <select
         name="dropdown-years"
         id="dropdown-years-start"
-        onChange={updateChartStartDate}
+        onChange={({ target }) => {
+          setStartYear(Number(target.value));
+        }}
       >
         {yearsArray.map((year) => (
           <option key={`${year}-start`} value={year}>
@@ -90,16 +94,20 @@ export default function Calculator() {
       <select
         name="dropdown-years"
         id="dropdown-years-end"
-        onChange={updateChartEndDate}
+        onChange={({ target }) => {
+          setEndYear(Number(target.value));
+        }}
       >
-        {yearsArray.map((year) => (
-          <option key={`${year}-end`} value={year}>
-            {year}
-          </option>
-        ))}
+        {yearsArray
+          .slice(0)
+          .reverse()
+          .map((year) => (
+            <option key={`${year}-end`} value={year}>
+              {year}
+            </option>
+          ))}
       </select>
       <canvas id="chart-container"></canvas>
-      <button onClick={() => generateChart()}>Click</button>
     </div>
   );
 }
