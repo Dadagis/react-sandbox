@@ -9,7 +9,7 @@ export default function Calculator() {
   const [yearsArray, setYearsArray] = useState([]);
   const [rangeArray, setRangeArray] = useState([]);
   const [revenue, setRevenue] = useState({});
-  const [dataFetched, setDataFecthed] = useState(false);
+  const [dataFetched, setDataFetched] = useState(false);
   const [baseData, setBaseData] = useState({
     2013: 550.8385,
     2014: 262.3083,
@@ -38,11 +38,13 @@ export default function Calculator() {
       },
     });
 
-    setDataFecthed(false);
+    setDataFetched(false);
     setChart(graph);
   };
 
   const fetchData = async () => {
+    if (startYear in revenue && endYear in revenue) return setDataFetched(true);
+
     let newData = {};
     yearsArray.forEach((year) => {
       if (year in baseData || year in revenue) {
@@ -59,7 +61,7 @@ export default function Calculator() {
           )
           .then(function (response) {
             newData[year] = response.data.market_data.current_price.eur;
-            setDataFecthed(true);
+            setDataFetched(true);
           })
           .catch(function (error) {
             console.log('error', error);
