@@ -4,16 +4,26 @@ import axios from 'axios';
 
 export default function Calculator() {
   const [chart, setChart] = useState(null);
-  const [startYear, setStartYear] = useState(2021);
+  const [startYear, setStartYear] = useState(2013);
   const [endYear, setEndYear] = useState(new Date().getFullYear());
   const [yearsArray, setYearsArray] = useState([]);
   const [rangeArray, setRangeArray] = useState([]);
   const [revenue, setRevenue] = useState({});
+  const [dataFetched, setDataFecthed] = useState(false);
+  const [baseData, setBaseData] = useState({
+    2013: 550.8385,
+    2014: 262.3083,
+    2015: 397.2716000000001,
+    2016: 918.5690623894318,
+    2017: 12364.1244485488,
+    2018: 3330.3767937287744,
+    2019: 6462.806847075976,
+    2020: 23445.60952998802,
+    2021: 41672.35465483228,
+  });
 
   const generateChart = () => {
     if (chart) chart.destroy();
-
-    console.log(revenue);
 
     const graph = new Chart(document.getElementById('chart-container'), {
       type: 'line',
@@ -28,27 +38,35 @@ export default function Calculator() {
       },
     });
 
+    setDataFecthed(false);
     setChart(graph);
   };
 
   const fetchData = async () => {
+    let newData = {};
     yearsArray.forEach((year) => {
-      axios
-        .get(
-          `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${formatDate(
-            year
-          )}&localization=false`,
-          { headers: { 'Access-Control-Allow-Origin': '*' } }
-        )
-        .then(function (response) {
-          // handle success
-          revenue[year] = response.data.market_data.current_price.eur;
-        })
-        .catch(function (error) {
-          // handle error
-          console.log('error', error);
-        });
+      if (year in baseData || year in revenue) {
+        console.log('ON A LA DATA');
+        newData[year] = baseData[year];
+      } else {
+        console.log('ON A PAS LA DATA');
+        axios
+          .get(
+            `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${formatDate(
+              year
+            )}&localization=false`,
+            { headers: { 'Access-Control-Allow-Origin': '*' } }
+          )
+          .then(function (response) {
+            newData[year] = response.data.market_data.current_price.eur;
+            setDataFecthed(true);
+          })
+          .catch(function (error) {
+            console.log('error', error);
+          });
+      }
     });
+    setRevenue(newData);
   };
 
   const formatDate = (year) => {
@@ -83,11 +101,14 @@ export default function Calculator() {
   }, []);
 
   useEffect(() => {
-    if (rangeArray.length > 0) {
-      fetchData();
+    fetchData();
+  }, [rangeArray]);
+
+  useEffect(() => {
+    if (rangeArray.length > 0 && Object.keys(revenue).length > 0) {
       generateChart();
     }
-  }, [rangeArray]);
+  }, [revenue, dataFetched]);
 
   useEffect(() => {
     populateRangeArray();
