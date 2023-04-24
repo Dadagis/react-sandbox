@@ -10,6 +10,7 @@ export default function Calculator() {
   const [rangeArray, setRangeArray] = useState([]);
   const [revenue, setRevenue] = useState({});
   const [dataFetched, setDataFetched] = useState(false);
+  const [baseIncome, setBaseIncome] = useState(null);
   const [baseData, setBaseData] = useState({
     2013: 550.8385,
     2014: 262.3083,
@@ -20,6 +21,7 @@ export default function Calculator() {
     2019: 6462.806847075976,
     2020: 23445.60952998802,
     2021: 41672.35465483228,
+    2022: 15479.995,
   });
 
   const generateChart = () => {
@@ -31,7 +33,7 @@ export default function Calculator() {
         labels: rangeArray,
         datasets: [
           {
-            label: 'Revenue',
+            label: 'Rate',
             data: rangeArray.map((year) => revenue[year]),
           },
         ],
@@ -118,10 +120,19 @@ export default function Calculator() {
 
   return (
     <div>
-      <p>{startYear}</p>
-      <p>{endYear}</p>
-      <p>{yearsArray}</p>
-      <p>{rangeArray}</p>
+      <p>
+        {baseIncome / revenue[startYear]} BTC en {startYear}
+      </p>
+      <p>
+        {(baseIncome / revenue[startYear]) * revenue[endYear]} EUR en {endYear}
+      </p>
+      <p>
+        {(((baseIncome / revenue[startYear]) * revenue[endYear] - baseIncome) /
+          baseIncome) *
+          100}
+        test
+      </p>
+      <p>{((revenue[endYear] - revenue[startYear]) / baseIncome) * 100} %</p>
       <select
         name="dropdown-years"
         id="dropdown-years-start"
@@ -151,6 +162,15 @@ export default function Calculator() {
             </option>
           ))}
       </select>
+      <label htmlFor="investment">Mise</label>
+      <input
+        type="text"
+        name="investment"
+        id="investment"
+        onChange={({ target }) => {
+          setBaseIncome(Number(target.value));
+        }}
+      />
       <canvas id="chart-container"></canvas>
     </div>
   );
