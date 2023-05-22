@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
+import '../styles/calculator.scss';
 
 export default function Calculator() {
   const [chart, setChart] = useState(null);
@@ -33,8 +34,14 @@ export default function Calculator() {
         labels: rangeArray,
         datasets: [
           {
-            label: 'Rate',
+            label: 'BTC Rate',
             data: rangeArray.map((year) => revenue[year]),
+          },
+          {
+            label: 'Equivalent money',
+            data: rangeArray.map((year) =>
+              Math.round((baseIncome / revenue[startYear]) * revenue[year])
+            ),
           },
         ],
       },
@@ -50,10 +57,8 @@ export default function Calculator() {
     let newData = {};
     yearsArray.forEach((year) => {
       if (year in baseData || year in revenue) {
-        console.log('ON A LA DATA');
         newData[year] = baseData[year];
       } else {
-        console.log('ON A PAS LA DATA');
         axios
           .get(
             `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${formatDate(
@@ -112,27 +117,29 @@ export default function Calculator() {
     if (rangeArray.length > 0 && Object.keys(revenue).length > 0) {
       generateChart();
     }
-  }, [revenue, dataFetched]);
+  }, [revenue, dataFetched, baseIncome]);
 
   useEffect(() => {
     populateRangeArray();
   }, [startYear, endYear]);
 
   return (
-    <div>
+    <div className="calculator">
       <p>
-        {baseIncome / revenue[startYear]} BTC en {startYear}
+        {(baseIncome / revenue[startYear]).toFixed(2)} BTC en {startYear}
       </p>
       <p>
-        {(baseIncome / revenue[startYear]) * revenue[endYear]} EUR en {endYear}
+        {((baseIncome / revenue[startYear]) * revenue[endYear]).toFixed(2)} EUR
+        en {endYear}
       </p>
       <p>
-        {(((baseIncome / revenue[startYear]) * revenue[endYear] - baseIncome) /
-          baseIncome) *
-          100}
-        test
+        {Math.round(
+          (((baseIncome / revenue[startYear]) * revenue[endYear] - baseIncome) /
+            baseIncome) *
+            100
+        )}{' '}
+        % ROI
       </p>
-      <p>{((revenue[endYear] - revenue[startYear]) / baseIncome) * 100} %</p>
       <select
         name="dropdown-years"
         id="dropdown-years-start"
