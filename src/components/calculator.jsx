@@ -24,6 +24,8 @@ export default function Calculator() {
     2021: 41672.35465483228,
     2022: 15479.995,
   });
+  const [frequency, setFrequency] = useState({ week: 53, month: 12, year: 1 });
+  const [chosenFrequency, setChosenFrequency] = useState(null);
 
   const generateChart = () => {
     if (chart) chart.destroy();
@@ -125,12 +127,19 @@ export default function Calculator() {
 
   return (
     <div className="calculator">
+      <p>{chosenFrequency}</p>
+      <p>{(endYear - startYear) * frequency[chosenFrequency]}</p>
+      <p>{(endYear - startYear) * frequency[chosenFrequency] * baseIncome}</p>
       <p>
         {(baseIncome / revenue[startYear]).toFixed(2)} BTC en {startYear}
       </p>
       <p>
-        {((baseIncome / revenue[startYear]) * revenue[endYear]).toFixed(2)} EUR
-        en {endYear}
+        {(
+          (((endYear - startYear) * frequency[chosenFrequency] * baseIncome) /
+            revenue[startYear]) *
+          revenue[endYear]
+        ).toFixed(2)}{' '}
+        EUR en {endYear}
       </p>
       <p>
         {Math.round(
@@ -168,6 +177,20 @@ export default function Calculator() {
               {year}
             </option>
           ))}
+      </select>
+      <span>chaque</span>
+      <select
+        name="dropdown-frequency"
+        id="dropdown-frequency"
+        onChange={({ target }) => {
+          setChosenFrequency(target.value);
+        }}
+      >
+        {Object.keys(frequency).map((key) => (
+          <option key={key} value={key}>
+            {key}
+          </option>
+        ))}
       </select>
       <label htmlFor="investment">Mise</label>
       <input
