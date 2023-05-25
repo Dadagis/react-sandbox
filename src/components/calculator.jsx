@@ -25,7 +25,7 @@ export default function Calculator() {
     2022: 15479.995,
   });
   const [frequency, setFrequency] = useState({ week: 53, month: 12, year: 1 });
-  const [chosenFrequency, setChosenFrequency] = useState(null);
+  const [chosenFrequency, setChosenFrequency] = useState('week');
 
   const generateChart = () => {
     if (chart) chart.destroy();
@@ -127,7 +127,7 @@ export default function Calculator() {
 
   return (
     <div className="calculator">
-      <p>{chosenFrequency}</p>
+      {/* <p>{chosenFrequency}</p>
       <p>{(endYear - startYear) * frequency[chosenFrequency]}</p>
       <p>{(endYear - startYear) * frequency[chosenFrequency] * baseIncome}</p>
       <p>
@@ -148,8 +148,10 @@ export default function Calculator() {
             100
         )}{' '}
         % ROI
-      </p>
+      </p> */}
+      <p>Interval of investment</p>
       <select
+        className="dropdown-years"
         name="dropdown-years"
         id="dropdown-years-start"
         onChange={({ target }) => {
@@ -163,6 +165,7 @@ export default function Calculator() {
         ))}
       </select>
       <select
+        className="dropdown-years"
         name="dropdown-years"
         id="dropdown-years-end"
         onChange={({ target }) => {
@@ -178,29 +181,60 @@ export default function Calculator() {
             </option>
           ))}
       </select>
-      <span>chaque</span>
-      <select
-        name="dropdown-frequency"
-        id="dropdown-frequency"
-        onChange={({ target }) => {
-          setChosenFrequency(target.value);
-        }}
-      >
-        {Object.keys(frequency).map((key) => (
-          <option key={key} value={key}>
-            {key}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="investment">Mise</label>
-      <input
-        type="text"
-        name="investment"
-        id="investment"
-        onChange={({ target }) => {
-          setBaseIncome(Number(target.value));
-        }}
-      />
+      <div>
+        <span>If I have been investing</span>
+        <input
+          className="dropdown-years"
+          type="text"
+          name="investment"
+          id="investment"
+          onChange={({ target }) => {
+            setBaseIncome(Number(target.value));
+          }}
+        />
+        <span>€ every</span>
+        <select
+          className="dropdown-years"
+          name="dropdown-frequency"
+          id="dropdown-frequency"
+          onChange={({ target }) => {
+            setChosenFrequency(target.value);
+          }}
+        >
+          {Object.keys(frequency).map((key) => (
+            <option key={key} value={key}>
+              {key}
+            </option>
+          ))}
+        </select>
+        <span>since {startYear}</span>
+      </div>
+      <div>
+        <span>I would now have </span>
+        <span>
+          {(endYear - startYear) * frequency[chosenFrequency] * baseIncome} €
+        </span>
+        <span> valued at </span>
+        <span className="current-money">
+          {(
+            (((endYear - startYear) * frequency[chosenFrequency] * baseIncome) /
+              revenue[startYear]) *
+            revenue[endYear]
+          ).toFixed(2)}{' '}
+          €
+        </span>
+        <span>
+          {' '}
+          with à ROI of{' '}
+          {Math.round(
+            (((baseIncome / revenue[startYear]) * revenue[endYear] -
+              baseIncome) /
+              baseIncome) *
+              100
+          )}{' '}
+          %
+        </span>
+      </div>
       <canvas id="chart-container"></canvas>
     </div>
   );
