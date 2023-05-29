@@ -24,7 +24,7 @@ export default function Calculator() {
     2021: 41672.35465483228,
     2022: 15479.995,
   });
-  const [frequency, setFrequency] = useState({ week: 53, month: 12, year: 1 });
+  const [frequency, setFrequency] = useState({ week: 52, month: 12, year: 1 });
   const [chosenFrequency, setChosenFrequency] = useState('week');
 
   const generateChart = () => {
@@ -220,7 +220,7 @@ export default function Calculator() {
             (((endYear - startYear) * frequency[chosenFrequency] * baseIncome) /
               revenue[startYear]) *
             revenue[endYear]
-          ).toFixed(2)}{' '}
+          ).toLocaleString()}{' '}
           €
         </span>
         <span>
