@@ -1,0 +1,99 @@
+.cta-button {
+  appearance: none;
+  width: 15rem;
+  height: 3rem;
+  background-color: #5961f6;
+  border-radius: 0.5rem;
+  border: none;
+  color: white;
+  font-weight: 700;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition-duration: 200ms;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+
+  &::before {
+    content: '€';
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.3rem;
+    position: absolute;
+    height: 1.5rem;
+    width: 1.5rem;
+    border: 2px solid white;
+    box-sizing: border-box;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1.5rem;
+  }
+
+  &:hover {
+    background-color: #7c83fd;
+  }
+
+  &:focus::before {
+    animation: bump 1s forwards;
+  }
+
+  &:focus + span {
+    animation: bump 1s forwards;
+  }
+
+  + span {
+    position: absolute;
+    color: rgb(188, 135, 0);
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.3rem;
+    text-align: center;
+    box-sizing: border-box;
+    height: 1.5rem;
+    width: 1.5rem;
+    background-color: rgb(255, 204, 0);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1.5rem;
+    z-index: -1;
+  }
+}
+
+@keyframes bump {
+  0% {
+    transform: scale(1, 1) rotateY(0deg);
+    top: 50%;
+  }
+
+  10% {
+    transform: scale(1.1, 0.9) rotateY(0deg);
+    top: 50%;
+  }
+
+  30% {
+    top: -60%;
+    transform: scale(0.9, 1.1) rotateY(180deg);
+  }
+
+  50% {
+    top: -60%;
+    transform: scale(1.05, 0.95) rotateY(360deg);
+  }
+
+  57% {
+    top: 50%;
+    transform: scale(1, 1) rotateY(360deg);
+  }
+
+  64% {
+    top: 50%;
+    transform: scale(1, 1) rotateY(360deg);
+  }
+
+  100% {
+    top: 50%;
+  }
+}
